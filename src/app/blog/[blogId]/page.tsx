@@ -2,7 +2,7 @@
 import Loading from "@/components/shared/Loader/Loading";
 import { Button } from "@/components/ui/button";
 import { useGetBlogByIdQuery } from "@/redux/api/blogApi";
-import { PenLine, UserRound } from "lucide-react";
+import { ImageIcon, PenLine, UserRound } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -55,12 +55,12 @@ const Blog = ({ params }: BlogProps) => {
 
   return (
     <div>
-      {!isFetchingData && blogs && blogs.data && blogs.data.imageUrl && (
+      {!isFetchingData && blogs && blogs.data && (
         <div className="mb-5 max-w-screen-lg mx-auto space-y-4">
           <h1 className="text-4xl font-semibold leading-10 tracking-wide">
             {blogs.data.title}
           </h1>
-          <div className="flex flex-col md:flex-row justify-between">
+          <div className="flex justify-between gap-7">
             <div className="flex flex-row items-center gap-4">
               <div className="border-[6px] border-slate-200 rounded-full bg-slate-200">
                 <UserRound className="w-8 h-8 text-slate-400 rounded-full" />
@@ -77,7 +77,7 @@ const Blog = ({ params }: BlogProps) => {
               </div>
             </div>
             <Button
-              className={`bg-black text-white border-[2px] border-black ${
+              className={`bg-black w-fit text-white border-[2px] border-black ${
                 isAuthor ? "hidden" : ""
               }`}
               onClick={() => router.push(`/blog/${blogId}/edit`)}
@@ -87,13 +87,19 @@ const Blog = ({ params }: BlogProps) => {
               Update
             </Button>
           </div>
-          <Image
-            src={blogs.data.imageUrl}
-            alt={blogs.data.title}
-            width={300}
-            height={200}
-            className="cover w-full h-96 object-cover"
-          />
+          {blogs.data.imageUrl ? (
+            <Image
+              src={blogs.data.imageUrl}
+              alt={blogs.data.title}
+              width={300}
+              height={200}
+              className="cover w-full h-40 md:h-96 object-cover"
+            />
+          ) : (
+            <div className="w-full flex justify-center items-center h-40 md:h-96 bg-slate-300 rounded-md">
+              <ImageIcon className="w-16 h-16 text-slate-100" />
+            </div>
+          )}
           <div
             className="prose max-w-none pt-3"
             dangerouslySetInnerHTML={{ __html: blogs.data.content }}
