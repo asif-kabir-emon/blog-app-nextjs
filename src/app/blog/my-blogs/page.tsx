@@ -23,10 +23,10 @@ const MyBlogs = () => {
 
   return (
     <div className="max-w-screen-xl my-5 mx-auto">
-      <h2 className="text-xl font-semibold text-slate-600 mb-5">Your Blogs</h2>
+      <h2 className="text-2xl text-slate-600 mb-5">Your Blogs</h2>
 
       {blogs.data.length === 0 && (
-        <div className="">
+        <div>
           <h4>You don't have any blogs yet. Create one now!</h4>
           <a href="/blog/create" className="text-slate-500 underline">
             Create Blog
@@ -54,7 +54,7 @@ const MyBlogs = () => {
               }) => (
                 <div
                   key={blog.id}
-                  className="border-[1px] p-3 rounded border-slate-100 max-h-[200px] hover:cursor-pointer"
+                  className="border-[1px] p-3 rounded border-gray-300 max-h-[200px] hover:cursor-pointer shadow-sm"
                 >
                   <Link href={`/blog/${blog.id}`} passHref>
                     <div className="flex flex-col md:flex-row gap-5">
@@ -92,7 +92,9 @@ const MyBlogs = () => {
                           <div
                             className="prose pt-3"
                             dangerouslySetInnerHTML={{
-                              __html: blog.content.slice(0, 200),
+                              __html:
+                                blog.content.slice(0, 250) +
+                                `${blog.content.length > 250 ? "..." : ""}`,
                             }}
                           />
                         </div>

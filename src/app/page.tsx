@@ -8,7 +8,6 @@ import React from "react";
 
 const Home = () => {
   const { data: blogs, isLoading: isFetchingData } = useGetBlogsQuery({});
-  const blog = {};
 
   if (isFetchingData) {
     return (
@@ -24,10 +23,11 @@ const Home = () => {
 
   return (
     <div className="max-w-screen-xl my-5 mx-auto">
-      {!blog && <div className="text-center ">No Blogs Found</div>}
+      <h2 className="text-2xl text-slate-600">Latest Posts</h2>
+      {!blogs && <div className="mt-2 text-slate-400">No Post Available.</div>}
 
       {blogs && blogs.data && blogs.data.length > 0 && (
-        <div className="space-y-4">
+        <div className="space-y-3  mt-5">
           {!isFetchingData &&
             blogs &&
             blogs.data &&
@@ -46,7 +46,7 @@ const Home = () => {
               }) => (
                 <div
                   key={blog.id}
-                  className="border-[1px] p-3 rounded border-slate-100 max-h-[350px] md:max-h-[200px] overflow-hidden hover:cursor-pointer"
+                  className="border-[1px] p-3 rounded border-gray-300 max-h-[200px] hover:cursor-pointer shadow-sm"
                 >
                   <Link href={`/blog/${blog.id}`} passHref>
                     <div className="flex flex-col md:flex-row gap-5">
@@ -56,7 +56,7 @@ const Home = () => {
                           alt={blog.title}
                           width={300}
                           height={300}
-                          className="w-full h-40 md:h-44 object-cover rounded"
+                          className="w-full h-40 object-cover rounded"
                         />
                       </div>
                       <div className="space-y-2 flex-1">
@@ -80,12 +80,16 @@ const Home = () => {
                             </span>
                           </div>
                         </div>
-                        <div
-                          className="prose pt-3"
-                          dangerouslySetInnerHTML={{
-                            __html: blog.content,
-                          }}
-                        />
+                        <div className="text-ellipsis overflow-hidden">
+                          <div
+                            className="prose pt-3"
+                            dangerouslySetInnerHTML={{
+                              __html:
+                                blog.content.slice(0, 250) +
+                                `${blog.content.length > 250 ? "..." : ""}`,
+                            }}
+                          />
+                        </div>
                       </div>
                     </div>
                   </Link>
