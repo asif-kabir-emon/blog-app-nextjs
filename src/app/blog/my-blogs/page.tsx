@@ -54,7 +54,7 @@ const MyBlogs = () => {
               }) => (
                 <div
                   key={blog.id}
-                  className="border-[1px] p-3 rounded border-gray-300 max-h-[200px] hover:cursor-pointer shadow-sm"
+                  className="border-[1px] p-3 rounded border-gray-300 md:max-h-[200px] hover:cursor-pointer shadow-sm"
                 >
                   <Link href={`/blog/${blog.id}`} passHref>
                     <div className="flex flex-col md:flex-row gap-5">
@@ -88,16 +88,14 @@ const MyBlogs = () => {
                             </span>
                           </div>
                         </div>
-                        <div className="text-ellipsis overflow-hidden">
-                          <div
-                            className="prose pt-3"
-                            dangerouslySetInnerHTML={{
-                              __html:
-                                blog.content.slice(0, 250) +
-                                `${blog.content.length > 250 ? "..." : ""}`,
-                            }}
-                          />
-                        </div>
+                        <div
+                          className="prose pt-3"
+                          dangerouslySetInnerHTML={{
+                            __html:
+                              blog.content.slice(0, 250) +
+                              `${blog.content.length > 250 ? "..." : ""}`,
+                          }}
+                        />
                       </div>
                     </div>
                   </Link>
