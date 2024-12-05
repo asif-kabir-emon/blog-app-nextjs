@@ -24,7 +24,7 @@ const Header = () => {
   };
 
   return (
-    <div className="sticky top-0 w-screen bg-white shadow-sm">
+    <div className="sticky top-0 w-screen bg-white shadow-sm z-10">
       <div className="h-14 w-full flex items-center justify-between gap-5 md:gap-7 px-5 md:px-10">
         <h1 className="text-2xl font-semibold text-slate-600">
           <a href="/">WriteFlow</a>
