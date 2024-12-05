@@ -5,25 +5,23 @@ import { authKey } from "@/constants";
 import Cookies from "js-cookie";
 import { Bookmark, LogOut, SquarePen, UserRound } from "lucide-react";
 import {
-  Menubar,
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-  MenubarSeparator,
-  MenubarTrigger,
-} from "@/components/ui/menubar";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/lib/Providers/Providers";
 
 const Header = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isLoggedIn, setIsLoggedIn } = useAuth();
 
-  useEffect(() => {
-    const checkLoginStatus = async () => {
-      const token = Cookies.get(authKey);
-      const loggedIn = token ? true : false;
-      setIsLoggedIn(loggedIn);
-    };
-    checkLoginStatus();
-  }, []);
+  const handleLogout = () => {
+    Cookies.remove(authKey);
+    localStorage.removeItem(authKey);
+    setIsLoggedIn(false);
+    window.location.href = "/";
+  };
 
   return (
     <div className="sticky top-0 w-screen bg-white shadow-sm">
@@ -43,7 +41,7 @@ const Header = () => {
                 <span>Write</span>
               </a>
             </li>
-            {!isLoggedIn && (
+            {!isLoggedIn ? (
               <li>
                 <a href="/login" className="hover:underline">
                   <Button className="bg-black text-white border-[2px] rounded-full">
@@ -51,55 +49,49 @@ const Header = () => {
                   </Button>
                 </a>
               </li>
-            )}
-            {isLoggedIn && (
+            ) : (
               <li>
-                <Menubar>
-                  <MenubarMenu>
-                    <MenubarTrigger className="rounded-full p-0">
-                      <div className="border-[5px] border-slate-200 rounded-full bg-slate-200 hover:cursor-pointer">
-                        <UserRound className="w-6 h-6 text-slate-400 rounded-full" />
-                      </div>
-                    </MenubarTrigger>
-                    <MenubarContent
-                      align="end"
-                      className="right-0 bg-white text-slate-500 text-[16px] px-3 py-3 space-y-1"
-                    >
-                      <MenubarItem>
-                        <a href="/profile">
-                          <div className="flex items-end gap-3 hover:cursor-pointer w-full">
-                            <UserRound className="w-5 h-5" />
-                            <span>Profile</span>
-                          </div>
-                        </a>
-                      </MenubarItem>
-                      <MenubarItem>
-                        <a href="/blog/my-blogs">
-                          <div className="flex items-end gap-3 hover:cursor-pointer w-full">
-                            <Bookmark className="w-5 h-5" />
-                            <span>Library</span>
-                          </div>
-                        </a>
-                      </MenubarItem>
-                      <div className="py-1 px-2">
-                        <MenubarSeparator className="bg-slate-100" />
-                      </div>
-
-                      <MenubarItem>
-                        <div
-                          className="flex items-end gap-3 hover:cursor-pointer w-full"
-                          onClick={() => {
-                            Cookies.remove(authKey);
-                            window.location.href = "/";
-                          }}
-                        >
-                          <LogOut className="w-5 h-5" />
-                          <span>Sign Out</span>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <div className="border-[5px] border-slate-200 rounded-full bg-slate-200 hover:cursor-pointer">
+                      <UserRound className="w-6 h-6 text-slate-400 rounded-full" />
+                    </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    className="right-0 bg-white text-slate-500 text-[16px] px-2 py-2 space-y-1 min-w-[130px] px-auto rounded-md mt-1"
+                  >
+                    <DropdownMenuItem>
+                      <a href="/profile">
+                        <div className="flex items-end gap-3 hover:cursor-pointer w-full">
+                          <UserRound className="w-5 h-5" />
+                          <span>Profile</span>
                         </div>
-                      </MenubarItem>
-                    </MenubarContent>
-                  </MenubarMenu>
-                </Menubar>
+                      </a>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <a href="/blog/my-blogs">
+                        <div className="flex items-end gap-3 hover:cursor-pointer w-full">
+                          <Bookmark className="w-5 h-5" />
+                          <span>Library</span>
+                        </div>
+                      </a>
+                    </DropdownMenuItem>
+                    <div className="py-1 px-2">
+                      <DropdownMenuSeparator className="bg-slate-100" />
+                    </div>
+
+                    <DropdownMenuItem>
+                      <div
+                        className="flex items-end gap-3 hover:cursor-pointer w-full"
+                        onClick={() => handleLogout()}
+                      >
+                        <LogOut className="w-5 h-5" />
+                        <span>Sign Out</span>
+                      </div>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </li>
             )}
           </ul>

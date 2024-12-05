@@ -52,35 +52,37 @@ const UpdateProfile = () => {
   };
 
   return (
-    <div>
-      <h2 className="text-lg font-semibold mb-5 text-slate-600">
-        Your Profile Information
-      </h2>
-      <Form
-        onSubmit={onSubmit}
-        resolver={zodResolver(ProfileSchema)}
-        defaultValues={{
-          name: profileData?.data?.name || "",
-          bio: profileData?.data?.bio || "",
-        }}
-      >
-        <div className="flex flex-col gap-3">
-          <InputBox
-            name="name"
-            type="text"
-            label="Name"
-            placeholder="Enter your name"
-          />
-          <TextAreaBox name="bio" label="Bio" placeholder="Enter your bio" />
-        </div>
-        <Button
-          type="submit"
-          className="mt-5 w-full bg-black text-white border-[2px] border-black"
-          disabled={isFetchingData || isUpdating}
+    <div className="max-w-screen-lg mx-auto">
+      <div className="border-[1px] border-slate-400 rounded-[5px] px-4 py-3">
+        <h2 className="text-lg font-semibold mb-4 text-slate-500">
+          Profile Information
+        </h2>
+        <Form
+          onSubmit={onSubmit}
+          resolver={zodResolver(ProfileSchema)}
+          defaultValues={{
+            name: profileData?.data?.name || "",
+            bio: profileData?.data?.bio || "",
+          }}
         >
-          Update Profile
-        </Button>
-      </Form>
+          <div className="flex flex-col gap-3">
+            <InputBox
+              name="name"
+              type="text"
+              label="Name"
+              placeholder="Enter your name"
+            />
+            <TextAreaBox name="bio" label="Bio" placeholder="Enter your bio" />
+          </div>
+          <Button
+            type="submit"
+            className="mt-5 w-full bg-black text-white border-[2px] border-black"
+            disabled={isFetchingData || isUpdating}
+          >
+            Update Profile Info
+          </Button>
+        </Form>
+      </div>
     </div>
   );
 };

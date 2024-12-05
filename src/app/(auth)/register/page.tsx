@@ -3,16 +3,18 @@ import Form from "@/components/form/Form";
 import InputBox from "@/components/form/InputBox";
 import { Button } from "@/components/ui/button";
 import { authKey } from "@/constants";
+import { useAuth } from "@/lib/Providers/Providers";
 import { Separator } from "@radix-ui/react-separator";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
-import { FieldValues } from "react-hook-form";
+import { FieldValues, set } from "react-hook-form";
 import { toast } from "sonner";
 
 const Register = () => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
+  const { setIsLoggedIn } = useAuth();
 
   const onSubmit = async (data: FieldValues) => {
     const toastId = toast.loading("Creating User Account", {
@@ -47,19 +49,23 @@ const Register = () => {
       if (!response.ok) {
         throw new Error(res?.message);
       }
-      const cookieExpiresIn = new Date(new Date().getTime() + 120 * 60 * 1000);
+      // const cookieExpiresIn = new Date(new Date().getTime() + 120 * 60 * 1000);
 
       Cookies.set(authKey, res.data.accessToken, {
         path: "/",
         secure: true,
         sameSite: "strict",
-        expires: cookieExpiresIn,
+        expires: 28,
       });
+
+      localStorage.setItem(authKey, res.data.accessToken);
 
       toast.success("User account created successfully.", {
         id: toastId,
         duration: 2000,
       });
+
+      setIsLoggedIn(true);
 
       router.push("/blog/my-blogs");
     } catch (error: any) {

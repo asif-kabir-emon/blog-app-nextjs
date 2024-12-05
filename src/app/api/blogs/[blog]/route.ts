@@ -165,7 +165,6 @@ export const GET = catchAsync(async (request: Request, context: any) => {
       updatedAt: true,
       user: {
         select: {
-          id: true,
           email: true,
           profile: {
             select: {

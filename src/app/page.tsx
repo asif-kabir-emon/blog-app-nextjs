@@ -46,7 +46,7 @@ const Home = () => {
               }) => (
                 <div
                   key={blog.id}
-                  className="border-[1px] p-3 rounded border-slate-100 max-h-[350px] md:max-h-[200px] overflow-hidden overflow-ellipsis hover:cursor-pointer"
+                  className="border-[1px] p-3 rounded border-slate-100 max-h-[350px] md:max-h-[200px] overflow-hidden hover:cursor-pointer"
                 >
                   <Link href={`/blog/${blog.id}`} passHref>
                     <div className="flex flex-col md:flex-row gap-5">

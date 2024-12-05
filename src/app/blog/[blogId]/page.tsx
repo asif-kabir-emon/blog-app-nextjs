@@ -26,13 +26,13 @@ const Blog = ({ params }: BlogProps) => {
     useGetBlogByIdQuery(blogId);
 
   useEffect(() => {
-    const checkAuthor = async (userId: string) => {
+    const checkAuthor = async (userEmail: string) => {
       const token = Cookies.get(authKey);
       if (token) {
         const user = jwtDecode(token) as jwtPayload;
 
         if (user && user.id) {
-          const isValid = user.id === userId ? false : true;
+          const isValid = user.email === userEmail ? false : true;
           setIsAuthor(isValid);
         }
       }
@@ -43,11 +43,9 @@ const Blog = ({ params }: BlogProps) => {
       blogs &&
       blogs.data &&
       blogs.data.user &&
-      blogs.data.user.id
+      blogs.data.user.email
     ) {
-      console.log(blogs);
-      console.log(blogs.data.user.id);
-      checkAuthor(blogs.data.user.id);
+      checkAuthor(blogs.data.user.email);
     }
   }, [isFetchingData, blogs]);
 

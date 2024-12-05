@@ -3,6 +3,7 @@ import Form from "@/components/form/Form";
 import InputBox from "@/components/form/InputBox";
 import { Button } from "@/components/ui/button";
 import { authKey } from "@/constants";
+import { useAuth } from "@/lib/Providers/Providers";
 import { Separator } from "@radix-ui/react-separator";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
@@ -13,6 +14,7 @@ import { toast } from "sonner";
 const Login = () => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
+  const { setIsLoggedIn } = useAuth();
 
   const onSubmit = async (data: FieldValues) => {
     const toastId = toast.loading("Logging in", { position: "top-center" });
@@ -44,16 +46,20 @@ const Login = () => {
       if (!response.ok) {
         throw new Error(res?.message);
       }
-      const cookieExpiresIn = new Date(new Date().getTime() + 120 * 60 * 1000);
+      // const cookieExpiresIn = new Date(new Date().getTime() + 120 * 60 * 1000);
+
+      localStorage.setItem(authKey, res.data.accessToken);
 
       Cookies.set(authKey, res.data.accessToken, {
         path: "/",
         secure: true,
         sameSite: "strict",
-        expires: cookieExpiresIn,
+        expires: 28,
       });
 
       toast.success("Logged In Successfully", { id: toastId, duration: 2000 });
+
+      setIsLoggedIn(true);
 
       router.push("/blog/my-blogs");
     } catch (error: any) {
