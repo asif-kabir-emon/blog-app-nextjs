@@ -1,7 +1,7 @@
 "use client";
 import BlogSkeleton from "@/components/shared/Loader/BlogSkeleton";
 import { useGetMyBlogsQuery } from "@/redux/api/blogApi";
-import { UserRound } from "lucide-react";
+import { ImageIcon, UserRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -35,7 +35,7 @@ const MyBlogs = () => {
       )}
 
       {blogs && blogs.data && blogs.data.length > 0 && (
-        <div className="space-y-3">
+        <div className="space-y-3  mt-5">
           {!isFetchingData &&
             blogs &&
             blogs.data &&
@@ -54,20 +54,24 @@ const MyBlogs = () => {
               }) => (
                 <div
                   key={blog.id}
-                  className="border-[1px] p-3 rounded border-gray-300 md:max-h-[200px] hover:cursor-pointer shadow-sm"
+                  className="border-[1px] p-3 rounded border-gray-300  hover:cursor-pointer shadow-sm"
                 >
                   <Link href={`/blog/${blog.id}`} passHref>
                     <div className="flex flex-col md:flex-row gap-5">
-                      <div className="">
+                      {blog.imageUrl ? (
                         <Image
                           src={blog.imageUrl}
                           alt={blog.title}
                           width={300}
                           height={300}
-                          className="w-full h-40 object-cover rounded"
+                          className="w-full md:w-60 h-44 object-cover rounded"
                         />
-                      </div>
-                      <div className="space-y-2 flex-1">
+                      ) : (
+                        <div className="w-full flex justify-center items-center md:w-60 h-44 bg-slate-200 rounded-md">
+                          <ImageIcon className="w-12 h-12 text-slate-100" />
+                        </div>
+                      )}
+                      <div className="space-y-2 flex-1 max-h-44 overflow-clip">
                         <h1 className="text-xl md:text-2xl font-bold">
                           {blog.title}
                         </h1>
@@ -91,9 +95,7 @@ const MyBlogs = () => {
                         <div
                           className="prose pt-3"
                           dangerouslySetInnerHTML={{
-                            __html:
-                              blog.content.slice(0, 250) +
-                              `${blog.content.length > 250 ? "..." : ""}`,
+                            __html: blog.content,
                           }}
                         />
                       </div>
