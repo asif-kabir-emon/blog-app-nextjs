@@ -10,19 +10,22 @@ import React, { useState } from "react";
 import { FieldValues } from "react-hook-form";
 import { toast } from "sonner";
 
-const Login = () => {
+const Register = () => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
 
   const onSubmit = async (data: FieldValues) => {
-    const toastId = toast.loading("Logging in", { position: "top-center" });
+    const toastId = toast.loading("Creating User Account", {
+      position: "top-center",
+    });
     setLoading(true);
 
+    const name = data.name;
     const email = data.email;
     const password = data.password;
 
-    if (!email || !password) {
-      toast.error("Email and Password are required", {
+    if (!email || !password || !name) {
+      toast.error("Name, Email and Password are required", {
         id: toastId,
         duration: 2000,
       });
@@ -31,12 +34,12 @@ const Login = () => {
     }
 
     try {
-      const response = await fetch("/api/login", {
+      const response = await fetch("/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, name }),
       });
 
       const res = await response.json();
@@ -53,11 +56,14 @@ const Login = () => {
         expires: cookieExpiresIn,
       });
 
-      toast.success("Logged In Successfully", { id: toastId, duration: 2000 });
+      toast.success("User account created successfully.", {
+        id: toastId,
+        duration: 2000,
+      });
 
-      router.push("/blog/create");
+      router.push("/blog/my-blogs");
     } catch (error: any) {
-      toast.error(error?.message || "Failed to Logged In", {
+      toast.error(error?.message || "Failed to create user account.", {
         id: toastId,
         duration: 2000,
       });
@@ -69,15 +75,22 @@ const Login = () => {
   return (
     <div className="h-full w-full flex justify-center items-center">
       <div className="shadow-sm border-[1px] border-black rounded-xl p-5 min-w-72 md:min-w-96 my-10 md:my-20">
-        <h1 className="text-2xl font-bold text-center mb-5">Login</h1>
+        <h1 className="text-2xl font-bold text-center mb-5">Create Account</h1>
         <Form
           onSubmit={onSubmit}
           defaultValues={{
+            name: "",
             email: "",
             password: "",
           }}
         >
           <div className="flex flex-col gap-2">
+            <InputBox
+              name="name"
+              type="text"
+              label="Name"
+              placeholder="Enter Full Name"
+            />
             <InputBox
               name="email"
               type="text"
@@ -96,15 +109,15 @@ const Login = () => {
             className="mt-3 w-full bg-black text-white border-[2px] border-black"
             disabled={loading}
           >
-            Login
+            Register
           </Button>
         </Form>
         <Separator className="my-5 font-xl" />
         <div>
           <p className="text-center">
-            Don't have an account?{" "}
-            <a href="/register" className="text-bold underline">
-              Register
+            Already have an account?{" "}
+            <a href="/login" className="underline">
+              Login
             </a>
           </p>
         </div>
@@ -113,4 +126,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

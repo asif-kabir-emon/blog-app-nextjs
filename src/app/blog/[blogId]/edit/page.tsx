@@ -1,21 +1,42 @@
 "use client";
 import Form from "@/components/form/Form";
 import InputBox from "@/components/form/InputBox";
-import { zodResolver } from "@hookform/resolvers/zod";
 import InputImage from "@/components/form/InputImage";
 import TextEditor from "@/components/form/TextEditor";
+import Loading from "@/components/shared/Loader/Loading";
 import { Button } from "@/components/ui/button";
-import { useCreateBlogMutation } from "@/redux/api/blogApi";
+import {
+  useGetBlogByIdQuery,
+  useUpdateBlogMutation,
+} from "@/redux/api/blogApi";
+import { BlogSchema } from "@/schema/blog.schema";
 import { modifyPayload } from "@/utils/modifyPayload";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { FieldValues } from "react-hook-form";
 import { toast } from "sonner";
-import { BlogSchema } from "@/schema/blog.schema";
-import { useRouter } from "next/navigation";
 
-const AddBlog = () => {
+type EditBlogProps = {
+  params: {
+    blogId: string;
+  };
+};
+
+const EditBlog = ({ params }: EditBlogProps) => {
   const router = useRouter();
-  const [addBlog, { isLoading: isCreating }] = useCreateBlogMutation();
+  const [updateBlog, { isLoading: isUpdating }] = useUpdateBlogMutation();
+
+  const { blogId } = params;
+  const { data: blogs, isLoading: isFetchingData } =
+    useGetBlogByIdQuery(blogId);
+
+  if (isFetchingData) {
+    return <Loading />;
+  }
+
+  console.log(blogs);
 
   const onSubmit = async (data: FieldValues) => {
     const uploadedImages = data.image ? data.image : null;
@@ -27,12 +48,15 @@ const AddBlog = () => {
     };
     const modifiedData = modifyPayload(payload);
 
-    const toastId = toast.loading("Please Wait! Try to add new Blog.", {
+    const toastId = toast.loading("Please Wait! Try to update blog.", {
       position: "top-center",
     });
 
     try {
-      const response = await addBlog(modifiedData).unwrap();
+      const response = await updateBlog({
+        id: blogId,
+        body: modifiedData,
+      }).unwrap();
 
       if (response?.success) {
         toast.success(response?.message || "Blog added successfully.", {
@@ -48,19 +72,32 @@ const AddBlog = () => {
         id: toastId,
       });
     } finally {
-      router.push(`/blog/my-blogs`);
+      router.push(`/blog/${blogId}`);
     }
   };
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4 text-slate-500">Create Blog</h2>
+      <h2 className="text-lg font-semibold mb-5 text-slate-600">
+        Update Blog Data
+      </h2>
+      {!isFetchingData && blogs && blogs.data && blogs.data.imageUrl && (
+        <div className="mb-5">
+          <Image
+            src={blogs.data.imageUrl}
+            alt={blogs.data.title}
+            width={300}
+            height={200}
+            className="cover w-full h-36 object-cover"
+          />
+        </div>
+      )}
       <Form
         onSubmit={onSubmit}
         resolver={zodResolver(BlogSchema)}
         defaultValues={{
-          title: "",
-          content: "",
+          title: blogs.data.title || "",
+          content: blogs.data.content || "",
           image: "",
         }}
       >
@@ -81,13 +118,13 @@ const AddBlog = () => {
         <Button
           type="submit"
           className="mt-5 w-full bg-black text-white border-[2px] border-black"
-          disabled={isCreating}
+          disabled={isFetchingData || isUpdating}
         >
-          Create Blog
+          Update Blog
         </Button>
       </Form>
     </div>
   );
 };
 
-export default AddBlog;
+export default EditBlog;

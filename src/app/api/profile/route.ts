@@ -47,3 +47,30 @@ export const PATCH = authGuard(
     });
   }),
 );
+
+export const GET = authGuard(
+  catchAsync(async (request: Request) => {
+    const user = request.user;
+
+    if (!user?.id || !user?.email) {
+      return ApiError(401, "Unauthorized: No token provided.");
+    }
+
+    const profile = await prisma.profile.findUnique({
+      where: {
+        userId: user.id,
+      },
+    });
+
+    if (!profile) {
+      return ApiError(404, "Profile not found!");
+    }
+
+    return sendResponse({
+      status: 200,
+      success: true,
+      message: "Successfully fetched profile.",
+      data: profile,
+    });
+  }),
+);

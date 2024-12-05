@@ -93,6 +93,24 @@ export const GET = catchAsync(async (request: Request) => {
         updatedAt: "desc",
       },
     ],
+    select: {
+      id: true,
+      title: true,
+      imageUrl: true,
+      content: true,
+      createdAt: true,
+      updatedAt: true,
+      user: {
+        select: {
+          email: true,
+          profile: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   return sendResponse({

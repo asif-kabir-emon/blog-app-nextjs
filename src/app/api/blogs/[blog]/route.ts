@@ -77,12 +77,7 @@ export const PATCH = authGuard(
       return ApiError(400, "Failed to update blog!");
     }
 
-    if (
-      image !== null &&
-      image !== "" &&
-      isBlogExist.imageUrl &&
-      image !== isBlogExist.imageUrl
-    ) {
+    if (file) {
       const publicId = isBlogExist.imageUrl
         .split("/")
         .slice(-3)
@@ -153,3 +148,43 @@ export const DELETE = authGuard(
     });
   }),
 );
+
+export const GET = catchAsync(async (request: Request, context: any) => {
+  const blogId = context.params.blog;
+
+  const blog = await prisma.blog.findUnique({
+    where: {
+      id: blogId,
+    },
+    select: {
+      id: true,
+      title: true,
+      imageUrl: true,
+      content: true,
+      createdAt: true,
+      updatedAt: true,
+      user: {
+        select: {
+          id: true,
+          email: true,
+          profile: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!blog) {
+    return ApiError(404, "Blog not found!");
+  }
+
+  return sendResponse({
+    status: 200,
+    success: true,
+    message: "Successfully fetched blog.",
+    data: blog,
+  });
+});

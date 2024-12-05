@@ -10,8 +10,8 @@ export const modifyPayload = (values: any) => {
   const formData = new FormData();
 
   formData.append("data", data);
-  if (file) {
-    formData.append("file", file as Blob);
+  if (file instanceof Blob) {
+    formData.append("file", file);
   }
   if (files) {
     files.forEach((file: Blob) => {

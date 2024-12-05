@@ -3,24 +3,15 @@ import { Button } from "@/components/ui/button";
 import React, { useEffect, useState } from "react";
 import { authKey } from "@/constants";
 import Cookies from "js-cookie";
-
-const HeaderMenu = [
-  {
-    name: "Write",
-    href: "/",
-    showLoggedIn: false,
-  },
-  {
-    name: "Login",
-    href: "/login",
-    showLoggedIn: false,
-  },
-  {
-    name: "Logout",
-    href: "/logout",
-    showLoggedIn: true,
-  },
-];
+import { Bookmark, LogOut, SquarePen, UserRound } from "lucide-react";
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarSeparator,
+  MenubarTrigger,
+} from "@/components/ui/menubar";
 
 const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -35,99 +26,87 @@ const Header = () => {
   }, []);
 
   return (
-    <div className="sticky top-0 w-screen border-b">
-      <div className="h-14 flex items-center px-5 md:px-10 w-full">
-        {/* Desktop */}
-        <DesktopHeader isLoggedIn={isLoggedIn} />
-        {/* Mobile */}
-        <MobileHeader isLoggedIn={isLoggedIn} />
+    <div className="sticky top-0 w-screen bg-white shadow-sm">
+      <div className="h-14 w-full flex items-center justify-between gap-5 md:gap-7 px-5 md:px-10">
+        <h1 className="text-2xl font-bold">
+          <a href="/">Blogs</a>
+        </h1>
+
+        <div className="flex-1">
+          <ul className="flex justify-end items-center gap-5 md:gap-7">
+            <li>
+              <a
+                href={isLoggedIn ? "/blog/create" : "/login"}
+                className="flex justify-center items-center gap-2 text-gray-500 hover:text-gray-600"
+              >
+                <SquarePen className="w-5 h-5" />
+                <span>Write</span>
+              </a>
+            </li>
+            {!isLoggedIn && (
+              <li>
+                <a href="/login" className="hover:underline">
+                  <Button className="bg-black text-white border-[2px] rounded-full">
+                    Sign in
+                  </Button>
+                </a>
+              </li>
+            )}
+            {isLoggedIn && (
+              <li>
+                <Menubar>
+                  <MenubarMenu>
+                    <MenubarTrigger className="rounded-full p-0">
+                      <div className="border-[5px] border-slate-200 rounded-full bg-slate-200 hover:cursor-pointer">
+                        <UserRound className="w-6 h-6 text-slate-400 rounded-full" />
+                      </div>
+                    </MenubarTrigger>
+                    <MenubarContent
+                      align="end"
+                      className="right-0 bg-white text-slate-500 text-[16px] px-3 py-3 space-y-1"
+                    >
+                      <MenubarItem>
+                        <a href="/profile">
+                          <div className="flex items-end gap-3 hover:cursor-pointer w-full">
+                            <UserRound className="w-5 h-5" />
+                            <span>Profile</span>
+                          </div>
+                        </a>
+                      </MenubarItem>
+                      <MenubarItem>
+                        <a href="/blog/my-blogs">
+                          <div className="flex items-end gap-3 hover:cursor-pointer w-full">
+                            <Bookmark className="w-5 h-5" />
+                            <span>Library</span>
+                          </div>
+                        </a>
+                      </MenubarItem>
+                      <div className="py-1 px-2">
+                        <MenubarSeparator className="bg-slate-100" />
+                      </div>
+
+                      <MenubarItem>
+                        <div
+                          className="flex items-end gap-3 hover:cursor-pointer w-full"
+                          onClick={() => {
+                            Cookies.remove(authKey);
+                            window.location.href = "/";
+                          }}
+                        >
+                          <LogOut className="w-5 h-5" />
+                          <span>Sign Out</span>
+                        </div>
+                      </MenubarItem>
+                    </MenubarContent>
+                  </MenubarMenu>
+                </Menubar>
+              </li>
+            )}
+          </ul>
+        </div>
       </div>
     </div>
   );
 };
 
 export default Header;
-
-const DesktopHeader = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
-  return (
-    <div className="w-full hidden md:flex items-center justify-between gap-5">
-      <h1 className="text-2xl font-bold">
-        <a href="/">Blogs</a>
-      </h1>
-
-      <div className="flex-1">
-        <ul className="flex justify-end items-center gap-5">
-          {/* <li>
-            <a href="/" className="hover:underline">
-              Blogs
-            </a>
-          </li> */}
-          <li>
-            <a href="/blog/create" className="hover:underline">
-              Write
-            </a>
-          </li>
-          {isLoggedIn ? (
-            <li>
-              <a href="/logout" className="hover:underline">
-                <Button className="bg-black text-white border-[2px] rounded-full">
-                  Logout
-                </Button>
-              </a>
-            </li>
-          ) : (
-            <li>
-              <a href="/login" className="hover:underline">
-                <Button className="bg-black text-white border-[2px] rounded-full">
-                  Sign in
-                </Button>
-              </a>
-            </li>
-          )}
-        </ul>
-      </div>
-    </div>
-  );
-};
-
-const MobileHeader = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
-  return (
-    <div className="w-full flex md:hidden items-center justify-between gap-5">
-      <h1 className="text-2xl font-bold">
-        <a href="/">Blogs</a>
-      </h1>
-
-      {/* <div className="flex-1">
-        <ul className="flex justify-end items-center gap-5">
-          <li>
-            <a href="/" className="hover:underline">
-              Blogs
-            </a>
-          </li>
-          <li>
-            <a href="/blog" className="hover:underline">
-              Write
-            </a>
-          </li>
-          {isLoggedIn ? (
-            <li>
-              <a href="/logout" className="hover:underline">
-                <Button className="bg-black text-white border-[2px] rounded-full">
-                  Logout
-                </Button>
-              </a>
-            </li>
-          ) : (
-            <li>
-              <a href="/login" className="hover:underline">
-                <Button className="bg-black text-white border-[2px] rounded-full">
-                  Sign in
-                </Button>
-              </a>
-            </li>
-          )}
-        </ul>
-      </div> */}
-    </div>
-  );
-};
