@@ -57,7 +57,7 @@ const Blog = ({ params }: BlogProps) => {
     <div>
       {!isFetchingData && blogs && blogs.data && (
         <div className="mb-5 max-w-screen-lg mx-auto space-y-4">
-          <h1 className="text-4xl font-semibold leading-10 tracking-wide">
+          <h1 className="text-2xl md:text-4xl font-semibold md:leading-10 tracking-wide">
             {blogs.data.title}
           </h1>
           <div className="flex justify-between gap-7">
