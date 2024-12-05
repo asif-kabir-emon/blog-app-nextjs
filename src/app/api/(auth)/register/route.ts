@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { sendResponse } from "@/utils/sendResponse";
 import { ApiError } from "@/utils/apiError";
@@ -33,25 +33,27 @@ export const POST = catchAsync(async (request: Request) => {
     Number(process.env.SALT_ROUNDS),
   );
 
-  const newUser = await prisma.$transaction(async (tsc) => {
-    const createdUser = await tsc.user.create({
-      data: {
-        email,
-        password: hashed_password,
-      },
-    });
+  const newUser = await prisma.$transaction(
+    async (tsc: Prisma.TransactionClient) => {
+      const createdUser = await tsc.user.create({
+        data: {
+          email,
+          password: hashed_password,
+        },
+      });
 
-    console.log(email, password, name);
+      console.log(email, password, name);
 
-    const createdProfile = await tsc.profile.create({
-      data: {
-        name,
-        userId: createdUser.id,
-      },
-    });
+      const createdProfile = await tsc.profile.create({
+        data: {
+          name,
+          userId: createdUser.id,
+        },
+      });
 
-    return createdUser;
-  });
+      return createdUser;
+    },
+  );
 
   if (!newUser) {
     return ApiError(400, "Failed to create user!");
