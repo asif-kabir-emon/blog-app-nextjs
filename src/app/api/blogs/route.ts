@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { sendResponse } from "@/utils/sendResponse";
 import { ApiError } from "@/utils/apiError";
 import { catchAsync } from "@/utils/handleApi";
@@ -27,48 +27,51 @@ export const POST = authGuard(
       return ApiError(401, "Unauthorized: No token provided.");
     }
 
-    const createBlog = await prisma.$transaction(async (tsc) => {
-      const createdBlog = await tsc.blog.create({
-        data: {
-          title,
-          imageUrl: "",
-          content,
-          isPublished: true,
-          userId: user?.id,
-        },
-      });
+    const createBlog = await prisma.$transaction(
+      async (tsc: Prisma.TransactionClient) => {
+        const createdBlog = await tsc.blog.create({
+          data: {
+            title,
+            imageUrl: "",
+            content,
+            isPublished: true,
+            userId: user?.id,
+          },
+        });
 
-      let image = "";
-      if (file) {
-        const fileBuffer = await file.arrayBuffer();
+        let image = "";
+        if (file) {
+          const fileBuffer = await file.arrayBuffer();
 
-        const mimeType = file.type;
-        const encoding = "base64";
-        const base64Data = Buffer.from(fileBuffer).toString("base64");
-        const fileUri = "data:" + mimeType + ";" + encoding + "," + base64Data;
+          const mimeType = file.type;
+          const encoding = "base64";
+          const base64Data = Buffer.from(fileBuffer).toString("base64");
+          const fileUri =
+            "data:" + mimeType + ";" + encoding + "," + base64Data;
 
-        const uploadCloudinary = (await uploadToCloudinary(
-          fileUri,
-          `blog_${user.id}_${createdBlog.id}`,
-          "blog-app/blogs",
-        )) as {
-          success: true;
-          result: { secure_url: string; public_id: string };
-        };
-        image = uploadCloudinary.result.secure_url;
-      }
+          const uploadCloudinary = (await uploadToCloudinary(
+            fileUri,
+            `blog_${user.id}_${createdBlog.id}`,
+            "blog-app/blogs",
+          )) as {
+            success: true;
+            result: { secure_url: string; public_id: string };
+          };
+          image = uploadCloudinary.result.secure_url;
+        }
 
-      const blogWithImageURL = await tsc.blog.update({
-        where: {
-          id: createdBlog.id,
-        },
-        data: {
-          imageUrl: image,
-        },
-      });
+        const blogWithImageURL = await tsc.blog.update({
+          where: {
+            id: createdBlog.id,
+          },
+          data: {
+            imageUrl: image,
+          },
+        });
 
-      return blogWithImageURL;
-    });
+        return blogWithImageURL;
+      },
+    );
 
     if (!createBlog) {
       return ApiError(400, "Failed to create blog!");
