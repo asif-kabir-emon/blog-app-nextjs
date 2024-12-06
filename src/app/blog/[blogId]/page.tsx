@@ -79,7 +79,7 @@ const Blog = ({ params }: BlogProps) => {
             </div>
             <Button
               className={`bg-black w-fit text-white border-[2px] border-black ${
-                isAuthor ? "hidden" : ""
+                isAuthor || !isLoggedIn ? "hidden" : ""
               }`}
               onClick={() => router.push(`/blog/${blogId}/edit`)}
               disabled={isAuthor || !isLoggedIn}
