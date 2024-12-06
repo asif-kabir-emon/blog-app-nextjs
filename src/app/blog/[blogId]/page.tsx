@@ -8,8 +8,8 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { authKey } from "@/constants";
-import { validateToken } from "@/utils/validateToken";
 import { jwtDecode } from "jwt-decode";
+import { useAuth } from "@/lib/Providers/Providers";
 
 type BlogProps = {
   params: {
@@ -19,6 +19,7 @@ type BlogProps = {
 
 const Blog = ({ params }: BlogProps) => {
   const { blogId } = params;
+  const { isLoggedIn } = useAuth();
   const router = useRouter();
   const [isAuthor, setIsAuthor] = useState(false);
 
@@ -31,7 +32,7 @@ const Blog = ({ params }: BlogProps) => {
       if (token) {
         const user = jwtDecode(token) as jwtPayload;
 
-        if (user && user.id) {
+        if (user && user.id && isLoggedIn) {
           const isValid = user.email === userEmail ? false : true;
           setIsAuthor(isValid);
         }
