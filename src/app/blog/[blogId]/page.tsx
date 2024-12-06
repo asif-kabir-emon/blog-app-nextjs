@@ -32,7 +32,7 @@ const Blog = ({ params }: BlogProps) => {
       if (token) {
         const user = jwtDecode(token) as jwtPayload;
 
-        if (user && user.id && isLoggedIn) {
+        if (user && user.id) {
           const isValid = user.email === userEmail ? false : true;
           setIsAuthor(isValid);
         }
@@ -82,7 +82,7 @@ const Blog = ({ params }: BlogProps) => {
                 isAuthor ? "hidden" : ""
               }`}
               onClick={() => router.push(`/blog/${blogId}/edit`)}
-              disabled={isAuthor}
+              disabled={isAuthor || !isLoggedIn}
             >
               <PenLine className="w-5 h-5" />
               Update
