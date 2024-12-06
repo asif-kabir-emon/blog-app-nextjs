@@ -14,6 +14,11 @@ export async function middleware(req: NextRequest) {
     }
   }
 
+  const blogIdMatch = req.nextUrl.pathname.match(/^\/blog\/[^/]+$/);
+  if (blogIdMatch) {
+    return NextResponse.next();
+  }
+
   if (
     req.nextUrl.pathname.startsWith("/blog") ||
     req.nextUrl.pathname.startsWith("/profile")
@@ -29,5 +34,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/login", "/blog", "/blog/:path*", "/profile", "/profile/:path*"],
+  matcher: ["/login", "/blog/:path*", "/profile/:path*"],
 };
