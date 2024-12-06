@@ -2,7 +2,7 @@
 
 WriteFlow is a user-friendly blogging platform designed for writers of all levels to share their ideas, stories, and insights. It offers a clean interface, powerful writing tools, and customizable options to help bloggers craft engaging content effortlessly.
 
-## Getting Started
+## Run the Project Locally
 
 First, run the development server:
 
@@ -18,8 +18,5 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 
