@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { authKey } from "@/constants";
 import Cookies from "js-cookie";
 import { Bookmark, LogOut, SquarePen, UserRound } from "lucide-react";

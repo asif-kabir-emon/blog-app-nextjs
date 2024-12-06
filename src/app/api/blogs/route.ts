@@ -87,15 +87,36 @@ export const POST = authGuard(
 );
 
 export const GET = catchAsync(async (request: Request) => {
+  const url = new URL(request.url);
+  const searchParams = new URLSearchParams();
+  url.searchParams.forEach((value, key) => {
+    searchParams.set(key.toLowerCase(), value);
+  });
+
+  const page = parseInt(searchParams.get("page") || "1");
+  const limit = parseInt(searchParams.get("limit") || "5");
+
+  // Ensure valid pagination parameters
+  const currentPage = Math.max(page, 1);
+  const pageSize = Math.max(limit, 1);
+
+  // Calculate skip and take for Prisma
+  const skip = (currentPage - 1) * pageSize;
+
+  // Fetch total count of blogs for meta data
+  const totalBlogs = await prisma.blog.count();
+
+  // Calculate total pages
+  const totalPages = Math.ceil(totalBlogs / pageSize);
+
   const blogs = await prisma.blog.findMany({
     orderBy: [
       {
         createdAt: "desc",
       },
-      {
-        updatedAt: "desc",
-      },
     ],
+    skip,
+    take: pageSize,
     select: {
       id: true,
       title: true,
@@ -121,7 +142,10 @@ export const GET = catchAsync(async (request: Request) => {
     success: true,
     message: "Successfully created a blog.",
     meta: {
-      total: blogs.length,
+      total: totalBlogs,
+      page: currentPage,
+      limit: pageSize,
+      totalPages: totalPages,
     },
     data: blogs,
   });

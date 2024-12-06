@@ -4,34 +4,88 @@ import { useGetBlogsQuery } from "@/redux/api/blogApi";
 import { ImageIcon, UserRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 const Home = () => {
-  const { data: blogs, isLoading: isFetchingData } = useGetBlogsQuery({});
+  const [page, setPage] = useState(1);
+  const [blogs, setBlogs] = useState<any[]>([]);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
-  if (isFetchingData) {
-    return (
-      <div className="space-y-3 max-w-screen-xl mx-auto">
-        {Array.from({ length: 2 }).map((_, index) => (
-          <div key={index}>
-            <BlogSkeleton />
-          </div>
-        ))}
-      </div>
+  const { data, isFetching } = useGetBlogsQuery(
+    { page, limit: 5 },
+    { skip: !hasMore },
+  );
+
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const observer = useRef<IntersectionObserver | null>(null);
+
+  useEffect(() => {
+    if (data?.data) {
+      // Append new blogs, ensuring no duplicates
+      setBlogs((prevBlogs) => {
+        const newBlogs = data.data.filter(
+          (newBlog: { id: any }) =>
+            !prevBlogs.some((blog) => blog.id === newBlog.id),
+        );
+        return [...prevBlogs, ...newBlogs];
+      });
+
+      // Check if there are more pages to fetch
+      const totalPages = data.meta.totalPages;
+      if (page > totalPages) {
+        setHasMore(false);
+      }
+      setIsFetchingMore(false);
+    }
+  }, [data, page]);
+
+  useEffect(() => {
+    if (!blogs.length || !hasMore) return;
+
+    const lastBlogElement = document.querySelector(
+      `[data-id="${blogs[blogs.length - 1]?.id}"]`,
     );
-  }
+
+    if (!lastBlogElement) return;
+
+    observer.current = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && hasMore && !isFetching && !isFetchingMore) {
+        setIsFetchingMore(true); // Prevent multiple triggers
+        setPage((prevPage) => prevPage + 1);
+      }
+    });
+
+    observer.current.observe(lastBlogElement);
+
+    return () => {
+      if (observer.current) observer.current.disconnect();
+    };
+  }, [blogs, hasMore, isFetching, isFetchingMore]);
 
   return (
-    <div className="max-w-screen-xl my-5 mx-auto">
-      <h2 className="text-2xl text-slate-600">Latest Posts</h2>
-      {!blogs && <div className="mt-2 text-slate-400">No Post Available.</div>}
+    <div className="max-w-screen-xl mx-auto">
+      <h2 className="text-xl md:text-2xl text-slate-600">
+        Discover the Latest Blog Posts
+      </h2>
+      {blogs.length === 0 && !hasMore && (
+        <div className="mt-2 text-slate-400">No Post Available.</div>
+      )}
 
-      {blogs && blogs.data && blogs.data.length > 0 && (
-        <div className="space-y-3  mt-5">
-          {!isFetchingData &&
-            blogs &&
-            blogs.data &&
-            blogs.data.map(
+      {blogs.length === 0 && hasMore && (
+        <div className="space-y-3 max-w-screen-xl mx-auto">
+          {Array.from({ length: 2 }).map((_, index) => (
+            <div key={index}>
+              <BlogSkeleton />
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="space-y-3 mt-5">
+        {blogs.length > 0 && (
+          <div className="space-y-3 mt-5">
+            {blogs.map(
               (blog: {
                 id: string;
                 imageUrl: string;
@@ -46,7 +100,8 @@ const Home = () => {
               }) => (
                 <div
                   key={blog.id}
-                  className="border-[1px] p-3 rounded border-gray-300  hover:cursor-pointer shadow-sm"
+                  data-id={blog.id}
+                  className="border-[1px] p-3 rounded border-gray-300 hover:cursor-pointer shadow-sm"
                 >
                   <Link href={`/blog/${blog.id}`} passHref>
                     <div className="flex flex-col md:flex-row gap-5">
@@ -96,8 +151,19 @@ const Home = () => {
                 </div>
               ),
             )}
-        </div>
-      )}
+          </div>
+        )}
+
+        {hasMore && (
+          <div ref={loadMoreRef} className="my-5 text-center">
+            {isFetchingMore && <BlogSkeleton />}
+          </div>
+        )}
+
+        {!hasMore && (
+          <p className="text-center text-gray-500">No more blogs to load.</p>
+        )}
+      </div>
     </div>
   );
 };

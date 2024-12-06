@@ -5,8 +5,8 @@ const Route_URL = "/blogs";
 export const BlogApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     getBlogs: build.query({
-      query: () => ({
-        url: `${Route_URL}`,
+      query: ({ page, limit }) => ({
+        url: `${Route_URL}?page=${page}&limit=${limit}`,
         method: "GET",
       }),
       providesTags: [TagTypes.blog],
