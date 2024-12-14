@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  app:
+    image: write-flow:1.0
+    container_name: write-flow
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env
